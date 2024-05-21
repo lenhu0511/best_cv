@@ -1,6 +1,6 @@
 import express from "express";
-import homeController from "../controller/homeController";
-import accountController from "../controller/accountController";
+import homeController from "../controller/homeController.js";
+import accountController from "../controller/accountController.js";
 
 let router = express.Router();
 
@@ -20,4 +20,5 @@ let initWebRoutes = (app) => {
     return app.use("/", router);
 }
 
-module.exports = initWebRoutes;
+// module.exports = initWebRoutes;
+export default initWebRoutes;

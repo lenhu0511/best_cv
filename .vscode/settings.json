@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/ab248de5-91d4-4542-b7ba-6e99269c56c0/resourceGroups/NAL-internship/providers/Microsoft.Web/sites/best-cv",
+    "appService.deploySubpath": "."
+}

@@ -1,4 +1,4 @@
-const { Sequelize } = require('sequelize');
+import Sequelize from "sequelize";
 
 // Option 3: Passing parameters separately (other dialects)
 const sequelize = new Sequelize('bestcv', 'team', 'Best123456', {
@@ -27,4 +27,5 @@ let connectDB = async () => {
       }
 }
 
-module.exports = connectDB;
+// module.exports = connectDB;
+export default connectDB;

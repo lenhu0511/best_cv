@@ -1,5 +1,5 @@
-import { raw } from "body-parser";
-import db from "../models/index";
+import raw  from "body-parser";
+import db from "../models/index.js";
 import bcrypt from "bcryptjs";
 
 let handleUserLogin = (email, password) => {
@@ -56,6 +56,7 @@ let checkUserEmail = (userEmail) => {
   });
 };
 
-module.exports = {
-  handleUserLogin: handleUserLogin,
-};
+// module.exports = {
+//   handleUserLogin: handleUserLogin,
+// };
+export default handleUserLogin;

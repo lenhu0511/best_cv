@@ -1,4 +1,4 @@
-import accountService from "../services/accountService";
+import accountService from "../services/accountService.js";
 
 let handleLogin = async (req, res) => {
   let email = req.body.email;
@@ -20,6 +20,7 @@ let handleLogin = async (req, res) => {
   });
 };
 
-module.exports = {
-  handleLogin: handleLogin,
-};
+// module.exports = {
+//   handleLogin: handleLogin,
+// };
+export default handleLogin;
