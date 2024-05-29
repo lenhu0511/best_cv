@@ -1,20 +1,19 @@
-import raw  from "body-parser";
-import db from "../models/index.js";
 import bcrypt from "bcryptjs";
+import db from '../models/index.js';
 
-let handleUserLogin = (email, password) => {
+const handleUserLogin = (email, password) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let userData = {};
-      let isExit = await checkUserEmail(email);
-      if (isExit) {
-        let user = await db.Account.findOne({
+      const userData = {};
+      const isExist = await checkUserEmail(email);
+      if (isExist) {
+        const user = await db.Account.findOne({
           attributes: ["email", "role_id", "password"],
-          where: { email: email },
+          where: { email },
           raw: true,
         });
         if (user) {
-          let check = await bcrypt.compareSync(password, user.password);
+          const check = await bcrypt.compare(password, user.password);
           if (check) {
             userData.errCode = 0;
             userData.errMessage = "Success";
@@ -26,11 +25,11 @@ let handleUserLogin = (email, password) => {
           }
         } else {
           userData.errCode = 2;
-          userData.errMessage = `User's not found!`;
+          userData.errMessage = `User not found!`;
         }
       } else {
         userData.errCode = 1;
-        userData.errMessage = `Your's Email isn't exist in system. Please try again.`;
+        userData.errMessage = `Your email isn't in the system. Please try again.`;
       }
       resolve(userData);
     } catch (e) {
@@ -39,24 +38,17 @@ let handleUserLogin = (email, password) => {
   });
 };
 
-let checkUserEmail = (userEmail) => {
+const checkUserEmail = (userEmail) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let user = await db.Account.findOne({
+      const user = await db.Account.findOne({
         where: { email: userEmail },
       });
-      if (user) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
+      resolve(!!user);
     } catch (e) {
       reject(e);
     }
   });
 };
 
-// module.exports = {
-//   handleUserLogin: handleUserLogin,
-// };
 export default handleUserLogin;

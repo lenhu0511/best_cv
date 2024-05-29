@@ -1,26 +1,54 @@
-import accountService from "../services/accountService.js";
+import bcrypt from "bcryptjs";
+import db from '../models/index.js';
 
-let handleLogin = async (req, res) => {
-  let email = req.body.email;
-  let password = req.body.password;
-
-  if (!email || !password) {
-    return res.status(500).json({
-      errCode: 1,
-      message: "Missing inputs parameter!",
-    });
-  }
-
-  let userData = await accountService.handleUserLogin(email, password);
-
-  return res.status(200).json({
-    errCode: userData.errCode,
-    message: userData.errMessage,
-    user: userData.user ? userData.user : {}
+const handleUserLogin = (email, password) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const userData = {};
+      const isExist = await checkUserEmail(email);
+      if (isExist) {
+        const user = await db.Account.findOne({
+          attributes: ["email", "role_id", "password"],
+          where: { email },
+          raw: true,
+        });
+        if (user) {
+          const check = await bcrypt.compare(password, user.password);
+          if (check) {
+            userData.errCode = 0;
+            userData.errMessage = "Success";
+            delete user.password;
+            userData.user = user;
+          } else {
+            userData.errCode = 3;
+            userData.errMessage = "Wrong password!";
+          }
+        } else {
+          userData.errCode = 2;
+          userData.errMessage = `User not found!`;
+        }
+      } else {
+        userData.errCode = 1;
+        userData.errMessage = `Your email isn't in the system. Please try again.`;
+      }
+      resolve(userData);
+    } catch (e) {
+      reject(e);
+    }
   });
 };
 
-// module.exports = {
-//   handleLogin: handleLogin,
-// };
-export default handleLogin;
+const checkUserEmail = (userEmail) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const user = await db.Account.findOne({
+        where: { email: userEmail },
+      });
+      resolve(!!user);
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+export default handleUserLogin;
