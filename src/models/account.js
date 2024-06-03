@@ -1,8 +1,8 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+import { Model } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
+
+export default (sequelize, DataTypes) => {
   class Account extends Model {
     /**
      * Helper method for defining associations.
@@ -11,9 +11,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      // Account.hasMany(models.Application, { foreignKey: 'account_id' });
+      // Account.hasOne(models.Candidate, { foreignKey: 'account_id' });
+      // Account.hasOne(models.Recruiter, { foreignKey: 'account_id' });
+      // Account.belongsTo(models.Role, { foreignKey: 'role_id' });
     }
   };
   Account.init({
+    id: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    defaultValue: () => uuidv4()  // Use uuidv4 to generate a unique ID
+  },
     username: DataTypes.STRING,
     password: DataTypes.STRING,
     email: DataTypes.STRING,

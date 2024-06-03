@@ -1,43 +1,21 @@
-// import express from "express";
-// import bodyParser from "body-parser";
-// import viewEngine from "./config/viewEngine";
-// import initWebRouters from "./route/web"
-// import connectDB from "./config/connectDB"
-// require('dotenv').config();
-
-// let app = express();
-
-// //config app
-
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({extended: true}))
-
-// viewEngine(app);
-// initWebRouters(app);
-
-// connectDB();
-
-// let port = process.env.PORT || 6969;
-// //port === undefines => port = 6969
-
-// app.listen(port, () => {
-//     //callback
-//     console.log("Backend Nodejs is running on the port : " + port)
-// })
-
 import express from 'express';
+import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fs from 'fs/promises'; // Sử dụng fs/promises để đọc file JSON
+import fs from 'fs/promises';
+import initWebRoutes from './route/web.js';
+import db from './models/index.js'; // Updated import to get db directly
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const app = express();
 const port = process.env.PORT || 6969;
 
-// Hàm async để nạp swagger.json
+app.use(express.json());
+app.use(cors());
+
+// Load and setup Swagger documentation
 async function loadSwaggerDocument() {
   const swaggerPath = path.join(__dirname, './swagger-output.json');
   const swaggerDocument = JSON.parse(await fs.readFile(swaggerPath, 'utf-8'));
@@ -52,6 +30,14 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.listen(port, () => {
-  console.log("Backend Nodejs is running on the port : " + port);
+// Ensure database connection is established before starting the server
+db.sequelize.authenticate().then(() => {
+  console.log('Connection has been established successfully.');
+  initWebRoutes(app, db);
+  app.listen(port, () => {
+    console.log("Backend Nodejs is running on the port : " + port);
+  });
+}).catch(error => {
+  console.error('Failed to initialize database:', error);
+  process.exit(1); // Exit the process with an error code
 });

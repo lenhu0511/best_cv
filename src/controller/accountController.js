@@ -1,54 +1,38 @@
-import bcrypt from "bcryptjs";
-import db from '../models/index.js';
+import accountService from "../services/accountService.js";
 
-const handleUserLogin = (email, password) => {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const userData = {};
-      const isExist = await checkUserEmail(email);
-      if (isExist) {
-        const user = await db.Account.findOne({
-          attributes: ["email", "role_id", "password"],
-          where: { email },
-          raw: true,
-        });
-        if (user) {
-          const check = await bcrypt.compare(password, user.password);
-          if (check) {
-            userData.errCode = 0;
-            userData.errMessage = "Success";
-            delete user.password;
-            userData.user = user;
-          } else {
-            userData.errCode = 3;
-            userData.errMessage = "Wrong password!";
-          }
-        } else {
-          userData.errCode = 2;
-          userData.errMessage = `User not found!`;
-        }
-      } else {
-        userData.errCode = 1;
-        userData.errMessage = `Your email isn't in the system. Please try again.`;
-      }
-      resolve(userData);
-    } catch (e) {
-      reject(e);
-    }
+
+let handleLogin = async (req, res) => {
+  let email = req.body.email;
+  let password = req.body.password;
+
+  if (!email || !password) {
+    return res.status(500).json({
+      errCode: 1,
+      message: "Missing inputs parameter!",
+    });
+  }
+
+  let userData = await accountService.handleUserLogin(email, password);
+
+  return res.status(200).json({
+    errCode: userData.errCode,
+    message: userData.errMessage,
+    user: userData.user ? userData.user : {},
+    token: userData.token
   });
 };
 
-const checkUserEmail = (userEmail) => {
-  return new Promise(async (resolve, reject) => {
+let handleSignup = async (req, res) => {
     try {
-      const user = await db.Account.findOne({
-        where: { email: userEmail },
-      });
-      resolve(!!user);
+        let newUser = await accountService.handleUserSignup(req.body);
+        return res.status(201).json(newUser);
     } catch (e) {
-      reject(e);
+        return res.status(500).json({ message: e.message });
     }
-  });
 };
 
-export default handleUserLogin;
+// module.exports = {
+//   handleLogin: handleLogin,
+// };
+
+export default {handleLogin, handleSignup};

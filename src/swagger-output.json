@@ -2,10 +2,10 @@
   "swagger": "2.0",
   "info": {
     "title": "My API",
-    "description": "Description",
+    "description": "This is an API for user authentication including login and signup functionalities.",
     "version": "1.0.0"
   },
-  "host": "localhost:8080",
+  "host": "localhost:6969",
   "basePath": "/",
   "schemes": [
     "http"
@@ -13,48 +13,85 @@
   "paths": {
     "/api/login": {
       "post": {
-        "description": "Login",
+        "description": "Logs in a user by checking email and password match. Returns user details without password.",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "email": { "example": "any" },
-                "password": { "example": "any" }
+                "email": { "type": "string", "example": "user@example.com" },
+                "password": { "type": "string", "example": "yourpassword" }
               }
             }
           }
         ],
         "responses": {
-          "200": { "description": "OK" },
-          "500": { "description": "Internal Server Error" }
-        }
+          "200": {
+            "description": "Successful login",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errCode": { "type": "integer", "example": 0 },
+                "message": { "type": "string", "example": "Success" },
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "email": { "type": "string", "example": "user@example.com" },
+                    "role_id": { "type": "string", "example": "user_role" }
+                  }
+                },
+                "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJhzKb5dJoaUQoH5mRKhy" }
+              }
+            }
+          },
+          "500": { "description": "Internal Server Error - Missing inputs or server error" }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/signup": {
       "post": {
-        "description": "Sign Up",
+        "description": "Creates a new user account. Ensures all necessary details are provided and valid.",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "username": { "example": "any" },
-                "password": { "example": "any" },
-                "email": { "example": "any" }
-              }
+                "username": { "type": "string", "example": "abc" },
+                "password": { "type": "string", "example": "s3cureP@ss" },
+                "email": { "type": "string", "example": "abc@example.com" },
+                "fullname": { "type": "string", "example": "ABC" },
+                "phonenumber": { "type": "string", "example": "0123456789" },
+                "roleId": { "type": "string", "example": "1" }
+              },
+              "required": ["username", "password", "email"]
             }
           }
         ],
         "responses": {
-          "200": { "description": "OK" },
-          "500": { "description": "Internal Server Error" }
+          "201": { "description": "User created successfully" },
+          "400": { "description": "Bad Request - Missing or invalid parameters" },
+          "500": { "description": "Internal Server Error - Error in creating user" }
         }
       }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter 'Bearer' [space] and then your token in the text input below.\nExample: 'Bearer abcdef12345'"
     }
   }
 }
