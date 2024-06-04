@@ -1,5 +1,7 @@
 'use strict';
 import { Model } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
+
 export default (sequelize, DataTypes) => {
   class CandidateCV extends Model {
     static associate(models) {
@@ -7,13 +9,33 @@ export default (sequelize, DataTypes) => {
     }
   }
   CandidateCV.init({
+    id: {
+      type: DataTypes.STRING,
+      primaryKey: true,
+      defaultValue: () => uuidv4()  // Use uuidv4 to generate a unique ID
+    },
     cv_title: DataTypes.STRING,
     cv_content: DataTypes.STRING,
-    create_date: DataTypes.DATE,
-    last_edit_date: DataTypes.DATE,
+    create_date: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    },
+    last_edit_date: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    },
   }, {
     sequelize,
     modelName: 'CandidateCV',
+    hooks: {
+      beforeCreate: (candidateCV, options) => {
+        candidateCV.create_date = new Date();
+        candidateCV.last_edit_date = new Date();
+      },
+      beforeUpdate: (candidateCV, options) => {
+        candidateCV.last_edit_date = new Date();
+      },
+    }
   });
   return CandidateCV;
 };

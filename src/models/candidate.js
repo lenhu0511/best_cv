@@ -1,5 +1,6 @@
 'use strict';
 import { Model } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
 export default (sequelize, DataTypes) => {
   class Candidate extends Model {
     static associate(models) {
@@ -12,6 +13,11 @@ export default (sequelize, DataTypes) => {
     }
   }
   Candidate.init({
+    id: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    defaultValue: () => uuidv4()  // Use uuidv4 to generate a unique ID
+  },
     full_name: DataTypes.STRING,
     dob: DataTypes.DATE,
     gender: DataTypes.STRING,

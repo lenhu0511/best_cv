@@ -31,8 +31,25 @@ let handleSignup = async (req, res) => {
     }
 };
 
-// module.exports = {
-//   handleLogin: handleLogin,
-// };
+let handleLogout = async (req, res) => {
+    // You can add logic here to blacklist the token or notify the client to discard the token
+    return res.status(200).json({
+        message: "Logged out successfully."
+    });
+};
 
-export default {handleLogin, handleSignup};
+const manageAccountProfile = async (req, res) => {
+  const userId = req.user.id;  // Assuming `req.user` is populated by authentication middleware
+  const profileData = req.body;
+  const action = req.method === 'GET' ? 'get' : 'update';  // Determine action based on HTTP method
+
+  const result = await accountService.manageProfile(userId, profileData, action);
+  if (result.status === 'success') {
+    res.status(action === 'get' ? 200 : 202).json(result.profile);
+  } else {
+    res.status(500).json({ message: result.message });
+  }
+};
+
+export default {handleLogin, handleSignup, handleLogout, manageAccountProfile}; 
+

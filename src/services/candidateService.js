@@ -1,180 +1,90 @@
 import db from '../models/index.js';
 
-// Get the current candidate profile
-const getCandidateProfile = async (userId) => {
-  try {
-    const candidate = await db.Candidate.findOne({ where: { account_id: userId } });
-    if (!candidate) {
-      throw new Error('Candidate profile not found');
+// Manage Candidate Profile
+const manageProfile = async (candidateId, data, action) => {
+    const candidate = await db.Candidate.findByPk(candidateId);
+    if (!candidate) return { status: 'error', message: 'Candidate not found' };
+
+    switch (action) {
+        case 'update':
+            await candidate.update(data);
+            return { status: 'success', data: candidate };
+        case 'get':
+            return { status: 'success', data: candidate };
+        default:
+            return { status: 'error', message: 'Invalid action' };
     }
-    return candidate;
-  } catch (error) {
-    throw new Error(error.message);
-  }
 };
 
-// Update the current candidate profile
-const updateCandidateProfile = async (userId, candidateData) => {
-  try {
-    const candidate = await db.Candidate.findOne({ where: { account_id: userId } });
-    if (!candidate) {
-      throw new Error('Candidate profile not found');
-    }
-    await candidate.update(candidateData);
-    return candidate;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+// Work Experience
+const addWorkExperience = async (candidateId, experience) => {
+    experience.candidate_id = candidateId;
+    const newExperience = await db.WorkExperience.create(experience);
+    return { status: 'success', data: newExperience };
 };
 
-// Apply for a job
-const applyJob = async (userId, jobId, applicationData) => {
-  try {
-    const newApplication = await db.Application.create({
-      ...applicationData,
-      account_id: userId,
-      job_id: jobId,
-      application_date: new Date()
+const getWorkExperiences = async (candidateId) => {
+    const experiences = await db.WorkExperience.findAll({
+        where: { candidate_id: candidateId }
     });
-    return newApplication;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+    return { status: 'success', data: experiences };
 };
 
-// Create and manage candidate CV
-const createCandidateCV = async (userId, cvData) => {
-  try {
-    const newCV = await db.CandidateCV.create({
-      ...cvData,
-      candidate_id: userId,
-      create_date: new Date(),
-      last_edit_date: new Date()
+const updateWorkExperience = async (id, data) => {
+    const experience = await db.WorkExperience.findByPk(id);
+    if (!experience) return { status: 'error', message: 'Work experience not found' };
+    await experience.update(data);
+    return { status: 'success', data: experience };
+};
+
+const deleteWorkExperience = async (id) => {
+    const experience = await db.WorkExperience.findByPk(id);
+    if (!experience) return { status: 'error', message: 'Work experience not found' };
+    await experience.destroy();
+    return { status: 'success', message: 'Deleted successfully' };
+};
+
+// Education
+const manageEducation = async (candidateId, educationData, action) => {
+    switch (action) {
+        case 'add':
+            educationData.candidate_id = candidateId;
+            const newEducation = await db.Education.create(educationData);
+            return { status: 'success', data: newEducation };
+        case 'get':
+            const educations = await db.Education.findAll({
+                where: { candidate_id: candidateId }
+            });
+            return { status: 'success', data: educations };
+        case 'update':
+            const education = await db.Education.findByPk(educationData.id);
+            if (!education) return { status: 'error', message: 'Education not found' };
+            await education.update(educationData);
+            return { status: 'success', data: education };
+        case 'delete':
+            const educationToDelete = await db.Education.findByPk(educationData.id);
+            if (!educationToDelete) return { status: 'error', message: 'Education not found' };
+            await educationToDelete.destroy();
+            return { status: 'success', message: 'Deleted successfully' };
+    }
+};
+
+// Apply for a Job
+const applyForJob = async (jobId, candidateId) => {
+    const application = await db.Application.create({
+        job_id: jobId,
+        account_id: candidateId,  // Assuming the account_id here refers to the candidate_id
+        status: 'Applied'
     });
-    return newCV;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-const updateCandidateCV = async (userId, cvId, cvData) => {
-  try {
-    const cv = await db.CandidateCV.findOne({ where: { id: cvId, candidate_id: userId } });
-    if (!cv) {
-      throw new Error('CV not found');
-    }
-    await cv.update({
-      ...cvData,
-      last_edit_date: new Date()
-    });
-    return cv;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-const deleteCandidateCV = async (userId, cvId) => {
-  try {
-    const cv = await db.CandidateCV.findOne({ where: { id: cvId, candidate_id: userId } });
-    if (!cv) {
-      throw new Error('CV not found');
-    }
-    await cv.destroy();
-    return { message: 'CV deleted successfully' };
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-// Manage candidate education
-const createEducation = async (userId, educationData) => {
-  try {
-    const newEducation = await db.Education.create({
-      ...educationData,
-      candidate_id: userId
-    });
-    return newEducation;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-const updateEducation = async (userId, educationId, educationData) => {
-  try {
-    const education = await db.Education.findOne({ where: { id: educationId, candidate_id: userId } });
-    if (!education) {
-      throw new Error('Education not found');
-    }
-    await education.update(educationData);
-    return education;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-const deleteEducation = async (userId, educationId) => {
-  try {
-    const education = await db.Education.findOne({ where: { id: educationId, candidate_id: userId } });
-    if (!education) {
-      throw new Error('Education not found');
-    }
-    await education.destroy();
-    return { message: 'Education deleted successfully' };
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-// Manage candidate work experience
-const createWorkExperience = async (userId, workExperienceData) => {
-  try {
-    const newWorkExperience = await db.WorkExperience.create({
-      ...workExperienceData,
-      candidate_id: userId
-    });
-    return newWorkExperience;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-const updateWorkExperience = async (userId, workExperienceId, workExperienceData) => {
-  try {
-    const workExperience = await db.WorkExperience.findOne({ where: { id: workExperienceId, candidate_id: userId } });
-    if (!workExperience) {
-      throw new Error('Work Experience not found');
-    }
-    await workExperience.update(workExperienceData);
-    return workExperience;
-  } catch (error) {
-    throw new Error(error.message);
-  }
-};
-
-const deleteWorkExperience = async (userId, workExperienceId) => {
-  try {
-    const workExperience = await db.WorkExperience.findOne({ where: { id: workExperienceId, candidate_id: userId } });
-    if (!workExperience) {
-      throw new Error('Work Experience not found');
-    }
-    await workExperience.destroy();
-    return { message: 'Work Experience deleted successfully' };
-  } catch (error) {
-    throw new Error(error.message);
-  }
+    return { status: 'success', data: application };
 };
 
 export default {
-  getCandidateProfile,
-  updateCandidateProfile,
-  applyJob,
-  createCandidateCV,
-  updateCandidateCV,
-  deleteCandidateCV,
-  createEducation,
-  updateEducation,
-  deleteEducation,
-  createWorkExperience,
-  updateWorkExperience,
-  deleteWorkExperience
+    manageProfile,
+    addWorkExperience,
+    getWorkExperiences,
+    updateWorkExperience,
+    deleteWorkExperience,
+    manageEducation,
+    applyForJob
 };

@@ -11,10 +11,10 @@ export default (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      // Account.hasMany(models.Application, { foreignKey: 'account_id' });
-      // Account.hasOne(models.Candidate, { foreignKey: 'account_id' });
-      // Account.hasOne(models.Recruiter, { foreignKey: 'account_id' });
-      // Account.belongsTo(models.Role, { foreignKey: 'role_id' });
+      Account.hasMany(models.Application, { foreignKey: 'account_id' });
+      Account.hasOne(models.Candidate, { foreignKey: 'account_id' });
+      Account.hasOne(models.Recruiter, { foreignKey: 'account_id' });
+      Account.belongsTo(models.Role, { foreignKey: 'role_id' });
     }
   };
   Account.init({
@@ -30,8 +30,14 @@ export default (sequelize, DataTypes) => {
     full_name: DataTypes.STRING,
     phone_number: DataTypes.STRING,
     status: DataTypes.STRING,
-    create_date: DataTypes.DATE,
-    update_date: DataTypes.DATE,
+    create_date: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    },
+    update_date: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    },
     role_id: DataTypes.STRING
 
   }, {

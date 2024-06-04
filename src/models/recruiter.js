@@ -1,5 +1,7 @@
 'use strict';
 import { Model } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
+
 export default (sequelize, DataTypes) => {
   class Recruiter extends Model {
     static associate(models) {
@@ -9,6 +11,11 @@ export default (sequelize, DataTypes) => {
     }
   }
   Recruiter.init({
+    id: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    defaultValue: () => uuidv4()  // Use uuidv4 to generate a unique ID
+  },
     company_name: DataTypes.STRING,
     company_description: DataTypes.STRING,
     contact_person: DataTypes.STRING,

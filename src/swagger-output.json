@@ -2,18 +2,32 @@
   "swagger": "2.0",
   "info": {
     "title": "My API",
-    "description": "This is an API for user authentication including login and signup functionalities.",
+    "description": "This is an API for user authentication including login, signup, logout functionalities, and recruiter management.",
     "version": "1.0.0"
   },
   "host": "localhost:6969",
   "basePath": "/",
-  "schemes": [
-    "http"
+  "schemes": ["http"],
+  "tags": [
+    {
+      "name": "Account Management",
+      "description": "APIs related to account operations such as login, signup, and profile management."
+    },
+    {
+      "name": "Recruiter Operations",
+      "description": "APIs related to recruiter functionalities such as posting jobs, managing profiles, and handling candidates."
+    },
+    {
+      "name": "Candidate Operations",
+      "description": "Operations available to Candidates"
+    }
+
   ],
   "paths": {
     "/api/login": {
       "post": {
-        "description": "Logs in a user by checking email and password match. Returns user details without password.",
+        "tags": ["Account Management"],
+        "description": "Logs in a user by checking email and password match. Returns user details without password and a token for authenticated sessions.",
         "parameters": [
           {
             "name": "body",
@@ -43,7 +57,7 @@
                     "role_id": { "type": "string", "example": "user_role" }
                   }
                 },
-                "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJhzKb5dJoaUQoH5mRKhy" }
+                "token": { "type": "string", "example": "valid.jwt.token" }
               }
             }
           },
@@ -58,6 +72,7 @@
     },
     "/api/signup": {
       "post": {
+        "tags": ["Account Management"],
         "description": "Creates a new user account. Ensures all necessary details are provided and valid.",
         "parameters": [
           {
@@ -67,14 +82,13 @@
             "schema": {
               "type": "object",
               "properties": {
-                "username": { "type": "string", "example": "abc" },
+                "username": { "type": "string", "example": "newuser" },
                 "password": { "type": "string", "example": "s3cureP@ss" },
-                "email": { "type": "string", "example": "abc@example.com" },
-                "fullname": { "type": "string", "example": "ABC" },
+                "email": { "type": "string", "example": "newuser@example.com" },
+                "fullname": { "type": "string", "example": "New User" },
                 "phonenumber": { "type": "string", "example": "0123456789" },
                 "roleId": { "type": "string", "example": "1" }
-              },
-              "required": ["username", "password", "email"]
+              }
             }
           }
         ],
@@ -84,6 +98,636 @@
           "500": { "description": "Internal Server Error - Error in creating user" }
         }
       }
+    },
+    "/api/logout": {
+      "post": {
+        "tags": ["Account Management"],
+        "description": "Logs out a user by instructing the client to discard the user's token.",
+        "responses": {
+          "200": {
+            "description": "Successful logout",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Logged out successfully."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/account/profile": {
+      "get": {
+        "tags": ["Account Management"],
+        "description": "Retrieves the profile of the logged-in user.",
+        "responses": {
+          "200": {
+            "description": "Profile retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": { "type": "string" },
+                "email": { "type": "string" },
+                "full_name": { "type": "string" },
+                "phone_number": { "type": "string" }
+              }
+            }
+          },
+          "404": { "description": "Profile not found" },
+          "500": { "description": "Internal server error" }
+        }
+      },
+      "put": {
+        "tags": ["Account Management"],
+        "description": "Updates the profile of the logged-in user.",
+        "parameters": [
+          {
+            "name": "profile",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "full_name": { "type": "string" },
+                "phone_number": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Profile updated successfully" },
+          "400": { "description": "Invalid request" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/api/recruiters/jobs": {
+      "post": {
+        "tags": ["Recruiter Operations"],
+        "description": "Post a new job by a recruiter.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "jobTitle": { "type": "string", "example": "Developer" },
+                "jobDescription": { "type": "string", "example": "Develop high-quality software." },
+                "jobType": { "type": "string", "example": "Full-time" },
+                "location": { "type": "string", "example": "Remote" },
+                "salary": { "type": "number", "example": 80000 }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Job posted successfully" },
+          "400": { "description": "Bad Request - Missing or invalid parameters" },
+          "500": { "description": "Internal Server Error - Error in posting job" }
+        }
+      }
+    },
+    "/api/recruiters/jobs/{jobId}": {
+      "put": {
+        "tags": ["Recruiter Operations"],
+        "description": "Update a job by a recruiter.",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the job"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "jobTitle": { "type": "string", "example": "Developer" },
+                "jobDescription": { "type": "string", "example": "Develop high-quality software." },
+                "jobType": { "type": "string", "example": "Full-time" },
+                "location": { "type": "string", "example": "Remote" },
+                "salary": { "type": "number", "example": 80000 }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Job updated successfully" },
+          "400": { "description": "Bad Request - Missing or invalid parameters" },
+          "404": { "description": "Not Found - Job not found" },
+          "500": { "description": "Internal Server Error - Error in updating job" }
+        }
+      },
+      "delete": {
+        "tags": ["Recruiter Operations"],
+        "description": "Delete a job by a recruiter.",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the job"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Job deleted successfully" },
+          "404": { "description": "Not Found - Job not found" },
+          "500": { "description": "Internal Server Error - Error in deleting job" }
+        }
+      }
+    },
+    "/api/recruiters/profile/{recruiterId}": {
+      "put": {
+        "tags": ["Recruiter Operations"],
+        "description": "Update recruiter company profile.",
+        "parameters": [
+          {
+            "name": "recruiterId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the recruiter"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "company_name": { "type": "string", "example": "Tech Corp" },
+                "company_description": { "type": "string", "example": "Leading tech company." },
+                "contact_person": { "type": "string", "example": "John Doe" },
+                "email": { "type": "string", "example": "contact@techcorp.com" },
+                "phone_number": { "type": "string", "example": "0123456789" },
+                "address": { "type": "string", "example": "123 Tech Street" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Profile updated successfully" },
+          "400": { "description": "Bad Request - Missing or invalid parameters" },
+          "404": { "description": "Not Found - Recruiter not found" },
+          "500": { "description": "Internal Server Error - Error in updating profile" }
+        }
+      }
+    },
+  "/api/recruiters/jobs/{jobId}/candidates": {
+      "get": {
+        "tags": ["Recruiter Operations"],
+        "description": "Retrieves candidates that have applied for a specific job.",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidates retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "candidateId": { "type": "string" },
+                  "fullName": { "type": "string" },
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Job not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/api/recruiters/candidates": {
+      "get": {
+        "tags": ["Recruiter Operations"],
+        "description": "Retrieves all candidates in the recruiter's network.",
+        "responses": {
+          "200": {
+            "description": "Candidates retrieved successfully",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "candidateId": { "type": "string" },
+                  "fullName": { "type": "string" },
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/api/recruiters/candidates/{candidateId}": {
+      "get": {
+        "tags": ["Recruiter Operations"],
+        "description": "Retrieves profile information for a specific candidate.",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Candidate profile retrieved successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fullName": { "type": "string" },
+                "email": { "type": "string" },
+                "details": { "type": "string" }
+              }
+            }
+          },
+          "404": { "description": "Candidate not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/api/candidates/profile/{candidateId}": {
+      "get": {
+        "tags": ["Candidate Operations"],
+        "summary": "Get a candidate's profile",
+        "description": "Retrieves the profile details of a candidate.",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the candidate"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of candidate profile",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "full_name": { "type": "string" },
+                "dob": { "type": "string", "format": "date" },
+                "gender": { "type": "string" },
+                "job_position": { "type": "string" },
+                "phone_number": { "type": "string" },
+                "address": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            }
+          },
+          "404": { "description": "Profile not found" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "put": {
+        "tags": ["Candidate Operations"],
+        "summary": "Update a candidate's profile",
+        "description": "Updates the profile details of a candidate.",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the candidate"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "full_name": { "type": "string" },
+                "dob": { "type": "string", "format": "date" },
+                "gender": { "type": "string" },
+                "job_position": { "type": "string" },
+                "phone_number": { "type": "string" },
+                "address": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Profile updated successfully" },
+          "400": { "description": "Invalid input, object invalid" },
+          "404": { "description": "Profile not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/api/candidates/work-experience/{candidateId}": {
+      "post": {
+        "tags": ["Candidate Operations"],
+        "summary": "Add work experience",
+        "description": "Adds work experience for a candidate.",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the candidate"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "job_name": { "type": "string" },
+                "company_name": { "type": "string" },
+                "start_date": { "type": "string", "format": "date" },
+                "end_date": { "type": "string", "format": "date" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Work experience added successfully" },
+          "400": { "description": "Invalid input, object invalid" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "get": {
+        "tags": ["Candidate Operations"],
+        "summary": "Get work experiences",
+        "description": "Retrieves all work experiences for a candidate.",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the candidate"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of work experiences",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "job_name": { "type": "string" },
+                  "company_name": { "type": "string" },
+                  "start_date": { "type": "string", "format": "date" },
+                  "end_date": { "type": "string", "format": "date" },
+                  "description": { "type": "string" }
+                }
+              }
+            }
+          },
+          "404": { "description": "No work experience found" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "put": {
+        "tags": ["Candidate Operations"],
+        "summary": "Update work experience",
+        "description": "Updates an existing work experience for a candidate.",
+        "parameters": [
+          {
+            "name": "experienceId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the work experience to update"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "job_name": { "type": "string" },
+                "company_name": { "type": "string" },
+                "start_date": { "type": "string", "format": "date" },
+                "end_date": { "type": "string", "format": "date" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Work experience updated successfully" },
+          "400": { "description": "Invalid input, object invalid" },
+          "404": { "description": "Work experience not found" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "delete": {
+        "tags": ["Candidate Operations"],
+        "summary": "Delete work experience",
+        "description": "Deletes a work experience for a candidate.",
+        "parameters": [
+          {
+            "name": "experienceId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the work experience to delete"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Work experience deleted successfully" },
+          "404": { "description": "Work experience not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/api/candidates/education/{candidateId}": {
+      "post": {
+        "tags": ["Candidate Operations"],
+        "summary": "Add education details",
+        "description": "Adds education details for a candidate.",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the candidate"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "school_name": { "type": "string" },
+                "major": { "type": "string" },
+                "education_level": { "type": "string" },
+                "from_date": { "type": "string", "format": "date" },
+                "end_date": { "type": "string", "format": "date" },
+                "gpa": { "type": "number" },
+                "is_graduate": { "type": "boolean" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Education details added successfully" },
+          "400": { "description": "Invalid input, object invalid" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "get": {
+        "tags": ["Candidate Operations"],
+        "summary": "Get education details",
+        "description": "Retrieves all education details for a candidate.",
+        "parameters": [
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the candidate"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of education details",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "school_name": { "type": "string" },
+                  "major": { "type": "string" },
+                  "education_level": { "type": "string" },
+                  "from_date": { "type": "string", "format": "date" },
+                  "end_date": { "type": "string", "format": "date" },
+                  "gpa": { "type": "number" },
+                  "is_graduate": { "type": "boolean" },
+                  "description": { "type": "string" }
+                }
+              }
+            }
+          },
+          "404": { "description": "No education details found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/api/candidates/education/{educationId}": {
+      "put": {
+        "tags": ["Candidate Operations"],
+        "summary": "Update education details",
+        "description": "Updates education details for a candidate.",
+        "parameters": [
+          {
+            "name": "educationId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the education record to update"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "school_name": { "type": "string" },
+                "major": { "type": "string" },
+                "education_level": { "type": "string" },
+                "from_date": { "type": "string", "format": "date" },
+                "end_date": { "type": "string", "format": "date" },
+                "gpa": { "type": "number" },
+                "is_graduate": { "type": "boolean" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Education details updated successfully" },
+          "400": { "description": "Invalid input, object invalid" },
+          "404": { "description": "Education details not found" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "delete": {
+        "tags": ["Candidate Operations"],
+        "summary": "Delete education details",
+        "description": "Deletes education details for a candidate.",
+        "parameters": [
+          {
+            "name": "educationId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the education record to delete"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Education details deleted successfully" },
+          "404": { "description": "Education details not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/api/candidates/jobs/apply/{jobId}/{candidateId}": {
+      "post": {
+        "tags": ["Candidate Operations"],
+        "summary": "Apply for a job",
+        "description": "Allows a candidate to apply for a specified job.",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the job to apply for"
+          },
+          {
+            "name": "candidateId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the candidate applying for the job"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Successfully applied for the job" },
+          "400": { "description": "Invalid input, object invalid" },
+          "404": { "description": "Job or candidate not found" },
+          "500": { "description": "Server error" }
+        }
+      }
     }
   },
   "securityDefinitions": {
@@ -91,7 +735,8 @@
       "type": "apiKey",
       "name": "Authorization",
       "in": "header",
-      "description": "Enter 'Bearer' [space] and then your token in the text input below.\nExample: 'Bearer abcdef12345'"
+      "description": "JWT Authorization header using the Bearer scheme. Example: 'Bearer abcdef12345'"
     }
-  }
+  },
+  "security": [] 
 }

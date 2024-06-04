@@ -1,5 +1,7 @@
 'use strict';
 import { Model } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';  
+
 export default (sequelize, DataTypes) => {
   class Application extends Model {
     /**
@@ -14,11 +16,18 @@ export default (sequelize, DataTypes) => {
     }
   };
   Application.init({
-    application_date: DataTypes.DATE,
+    id: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    defaultValue: () => uuidv4()  // Use uuidv4 to generate a unique ID
+  },
+    application_date:{
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    },
     status: DataTypes.STRING,
     job_id: DataTypes.STRING,
     account_id: DataTypes.STRING
-
   }, {
     freezeTableName: true,
     sequelize,

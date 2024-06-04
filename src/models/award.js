@@ -1,5 +1,7 @@
 'use strict';
 import { Model } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
+
 export default (sequelize, DataTypes) => {
   class Award extends Model {
     /**
@@ -13,6 +15,11 @@ export default (sequelize, DataTypes) => {
     }
   };
   Award.init({
+    id: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    defaultValue: () => uuidv4()  // Use uuidv4 to generate a unique ID
+  },
     award_name: DataTypes.STRING,
     date_received: DataTypes.DATE,
     certificate_img_url: DataTypes.STRING,

@@ -1,5 +1,7 @@
 'use strict';
 import { Model } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
+
 export default (sequelize, DataTypes) => {
   class Education extends Model {
     static associate(models) {
@@ -7,6 +9,11 @@ export default (sequelize, DataTypes) => {
     }
   }
   Education.init({
+    id: {
+    type: DataTypes.STRING,
+    primaryKey: true,
+    defaultValue: () => uuidv4()  // Use uuidv4 to generate a unique ID
+  },
     gpa: DataTypes.FLOAT,
     description: DataTypes.STRING,
     education_level: DataTypes.STRING,

@@ -104,4 +104,43 @@ let hashUserPassword = (password) => {
   });
 };
 
-export default {handleUserLogin, handleUserSignup};
+const manageProfile = async (userId, profileData, action) => {
+  try {
+    const account = await db.Account.findByPk(userId, {
+      include: [
+        { model: db.Candidate },
+        { model: db.Recruiter }
+      ]
+    });
+    if (!account) return { status: 'error', message: 'Account not found' };
+
+    let profile;
+    switch (action) {
+      case 'get':
+        // Assuming separate profiles exist within the Candidate and Recruiter models
+        profile = account.Candidate || account.Recruiter;
+        return { status: 'success', profile: profile ? profile.toJSON() : {} };
+      case 'update':
+        // Selectively update based on the role_id and the corresponding profile
+        if (account.role_id === 'candidate_id' && account.Candidate) {
+          profile = await account.Candidate.update(profileData);
+        } else if (account.role_id === 'recruiter_id' && account.Recruiter) {
+          profile = await account.Recruiter.update(profileData);
+        } else {
+          return { status: 'error', message: 'Profile not found or mismatched role' };
+        }
+        return { status: 'success', profile: profile };
+      default:
+        return { status: 'error', message: 'Invalid action' };
+    }
+  } catch (error) {
+    return { status: 'error', message: error.message };
+  }
+};
+
+
+export default {
+  handleUserLogin,
+  handleUserSignup,
+  manageProfile,
+};
