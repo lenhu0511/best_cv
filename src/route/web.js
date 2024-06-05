@@ -2,6 +2,7 @@ import express from "express";
 import accountController from "../controller/accountController.js";
 import candidateController from "../controller/candidateController.js"; 
 import recruiterController from "../controller/recruiterController.js";
+import authenticateToken from '../middleware/authenticateToken.js'; 
 
 let router = express.Router();
 
@@ -10,8 +11,9 @@ const initWebRoutes = (app) => {
     router.post('/api/signup', accountController.handleSignup);
     router.post('/api/login', accountController.handleLogin);
     router.post('/api/logout', accountController.handleLogout);
-    router.get('/api/account/profile', accountController.manageAccountProfile); // To get the profile
-    router.put('/api/account/profile', accountController.manageAccountProfile); // To update the profile
+    // Apply middleware to profile routes
+    router.get('/api/account/profile', authenticateToken, accountController.getAccountProfile); // To get the profile
+    router.put('/api/account/profile', authenticateToken, accountController.updateAccountProfile); // To update the profile
 
     // Recruiter Functions
     router.post('/api/recruiters/jobs', recruiterController.postJob);

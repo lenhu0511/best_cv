@@ -28,8 +28,8 @@ const handleUserLogin = (email, password) => {
 
             // Generate token
             const token = jwt.sign(
-              { email: user.email, role_id: user.role_id },
-              'your_secret_key',  // Make sure to use a secret key from your environment
+              { email: user.email, role_id: user.role_id, id: user.id  },
+              process.env.ACCESS_TOKEN_SECRET,  // Make sure to use a secret key from your environment
               { expiresIn: '24h' }  // Token expires in 24 hours
             );
 
@@ -84,7 +84,7 @@ let handleUserSignup = async (data) => {
         status: 'active', // Set default status
         create_date: currentDate,
         update_date: currentDate,
-        role_id: data.roleId || 'default_role_id' // Add role_id, use default if not provided
+        role_id: data.roleId // Add role_id, use default if not provided
       });
       resolve(newUser);
     } catch (e) {
@@ -104,43 +104,79 @@ let hashUserPassword = (password) => {
   });
 };
 
-const manageProfile = async (userId, profileData, action) => {
+const getAccountInfo = async (email) => {
   try {
-    const account = await db.Account.findByPk(userId, {
-      include: [
-        { model: db.Candidate },
-        { model: db.Recruiter }
-      ]
+    const account = await db.Account.findOne({
+      where: { email: email },
+      include: [ ]
     });
-    if (!account) return { status: 'error', message: 'Account not found' };
 
-    let profile;
-    switch (action) {
-      case 'get':
-        // Assuming separate profiles exist within the Candidate and Recruiter models
-        profile = account.Candidate || account.Recruiter;
-        return { status: 'success', profile: profile ? profile.toJSON() : {} };
-      case 'update':
-        // Selectively update based on the role_id and the corresponding profile
-        if (account.role_id === 'candidate_id' && account.Candidate) {
-          profile = await account.Candidate.update(profileData);
-        } else if (account.role_id === 'recruiter_id' && account.Recruiter) {
-          profile = await account.Recruiter.update(profileData);
-        } else {
-          return { status: 'error', message: 'Profile not found or mismatched role' };
-        }
-        return { status: 'success', profile: profile };
-      default:
-        return { status: 'error', message: 'Invalid action' };
+    if (!account) {
+      return { status: 'error', message: 'Account not found' };
     }
+
+    const profileData = account.role_id === 'candidate' ? account.Candidate : account.Recruiter;
+
+    const response = {
+      status: 'success',
+      account: {
+        id: account.id,
+        username: account.username,
+        email: account.email,
+        fullName: account.full_name,
+        phoneNumber: account.phone_number,
+        role_id: account.role_id
+      },
+      profile: profileData
+    };
+
+    return response;
   } catch (error) {
     return { status: 'error', message: error.message };
   }
 };
 
+const updateAccountInfo = async (email, updateData) => {
+  try {
+    const account = await db.Account.findOne({ where: { email: email } });
+    if (!account) {
+      return { status: 'error', message: 'Account not found' };
+    }
+
+    console.log('Original Account:', account);
+
+    // Update the account with provided data, except for role_id
+    const updatedAccount = await account.update({
+      username: updateData.username || account.username,
+      full_name: updateData.full_name || account.full_name,  // Ensure this key matches the input
+      phone_number: updateData.phone_number || account.phone_number,
+      update_date: new Date()  // Update the update_date to current date
+    });
+
+    console.log('Updated Account:', updatedAccount);
+
+    return {
+      status: 'success',
+      message: 'Profile updated successfully',
+      account: {
+        id: updatedAccount.id,
+        username: updatedAccount.username,
+        email: updatedAccount.email,
+        full_name: updatedAccount.full_name,  // Ensure this key matches the updated field
+        phone_number: updatedAccount.phone_number,
+        role_id: updatedAccount.role_id // Ensure role_id is not updated
+      }
+    };
+  } catch (error) {
+    console.log('Error updating account:', error);
+    return { status: 'error', message: 'Failed to update account: ' + error.message };
+  }
+};
 
 export default {
   handleUserLogin,
   handleUserSignup,
-  manageProfile,
+  updateAccountInfo,
+  getAccountInfo,
 };
+

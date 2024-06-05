@@ -1,6 +1,6 @@
 import accountService from "../services/accountService.js";
 
-
+// Function to handle user login
 let handleLogin = async (req, res) => {
   let email = req.body.email;
   let password = req.body.password;
@@ -22,6 +22,7 @@ let handleLogin = async (req, res) => {
   });
 };
 
+// Function to handle user signup
 let handleSignup = async (req, res) => {
     try {
         let newUser = await accountService.handleUserSignup(req.body);
@@ -38,18 +39,42 @@ let handleLogout = async (req, res) => {
     });
 };
 
-const manageAccountProfile = async (req, res) => {
-  const userId = req.user.id;  // Assuming `req.user` is populated by authentication middleware
-  const profileData = req.body;
-  const action = req.method === 'GET' ? 'get' : 'update';  // Determine action based on HTTP method
+// Function to handle getting the user profile
+const getAccountProfile = async (req, res) => {
+    const userEmail = req.user.email;  // Assuming email is extracted from the authenticated token
 
-  const result = await accountService.manageProfile(userId, profileData, action);
-  if (result.status === 'success') {
-    res.status(action === 'get' ? 200 : 202).json(result.profile);
-  } else {
-    res.status(500).json({ message: result.message });
-  }
+    const result = await accountService.getAccountInfo(userEmail);
+    if (result.status === 'success') {
+        return res.status(200).json({
+            message: "Profile retrieved successfully",
+            data: result.account
+        });
+    } else {
+        return res.status(404).json({ message: result.message });
+    }
 };
 
-export default {handleLogin, handleSignup, handleLogout, manageAccountProfile}; 
+// Function to handle updating the user profile
+const updateAccountProfile = async (req, res) => {
+    const userEmail = req.user.email;  // Assuming email is extracted from the authenticated token
+    const updateData = {
+        username: req.body.username,
+        full_name: req.body.full_name,  // Ensure this key matches the input
+        phone_number: req.body.phone_number
+    };
 
+    const result = await accountService.updateAccountInfo(userEmail, updateData);
+    if (result.status === 'success') {
+        res.status(200).json(result);
+    } else {
+        res.status(500).json({ message: result.message });
+    }
+};
+
+export default {
+    handleLogin,
+    handleSignup,
+    handleLogout,
+    getAccountProfile,
+    updateAccountProfile
+};

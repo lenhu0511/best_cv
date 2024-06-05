@@ -6,14 +6,36 @@ import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import initWebRoutes from './route/web.js';
 import db from './models/index.js'; // Updated import to get db directly
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config(); // This will load the .env file and make the variables available via process.env
+
+// console.log('Access token secret:', process.env.ACCESS_TOKEN_SECRET);
+
+// const secretKey = process.env.ACCESS_TOKEN_SECRET;
+// const token = jwt.sign({ data: 'some data' }, secretKey, { expiresIn: '2h' });
+// jwt.verify(token, secretKey, function(err, decoded) {
+//   if (err) {
+//     console.log('Token verification failed.');
+//   } else {
+//     console.log('Decoded JWT:', decoded);
+//   }
+// });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 6969;
-
+const corsOptions = {
+    origin: true, 
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: 'GET,POST,PUT,DELETE,OPTIONS'
+};
 app.use(express.json());
 app.use(cors());
+
+
 
 // Load and setup Swagger documentation
 async function loadSwaggerDocument() {

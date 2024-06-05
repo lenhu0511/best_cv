@@ -138,7 +138,12 @@
           },
           "404": { "description": "Profile not found" },
           "500": { "description": "Internal server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "put": {
         "tags": ["Account Management"],
@@ -151,8 +156,8 @@
             "schema": {
               "type": "object",
               "properties": {
-                "full_name": { "type": "string" },
-                "phone_number": { "type": "string" }
+                "full_name": { "type": "string", "example": "linh" },
+                "phone_number": { "type": "string", "example": "1010101010" }
               }
             }
           }
@@ -161,7 +166,12 @@
           "200": { "description": "Profile updated successfully" },
           "400": { "description": "Invalid request" },
           "500": { "description": "Internal server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/recruiters/jobs": {
