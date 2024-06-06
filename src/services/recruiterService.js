@@ -1,6 +1,35 @@
 import db from '../models/index.js';
+import accountService from './accountService.js';
 
-// Service to update company profile
+// Service to create a new recruiter profile
+// Refactored function to create a new recruiter profile using direct data fields
+let createRecruiterProfile = (email, data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const accountInfo = await accountService.getAccountInfo(email);
+            if (accountInfo.status !== 'success') {
+                throw new Error(accountInfo.message); // Handle the case where the account is not found
+            }
+            data.account_id = accountInfo.account.id; // Set the account_id from the fetched account
+
+            let newRecruiter = await db.Recruiter.create({
+                company_name: data.companyName,
+                company_description: data.companyDescription,
+                contact_person: data.contactPerson,
+                email: data.email,
+                phone_number: data.phonenumber,
+                address: data.address,
+                account_id: data.account_id // Include the account ID
+            });
+            resolve(newRecruiter);
+        } catch (e) {
+            reject(e);
+        }
+    });
+}
+
+
+// Service to update company (recruiter) profile
 const updateCompanyProfile = async (recruiterId, profileData) => {
     try {
         const recruiter = await db.Recruiter.findByPk(recruiterId);
@@ -89,6 +118,7 @@ const getAllCandidates = async () => {
 };
 
 export default {
+    createRecruiterProfile,
     updateCompanyProfile,
     postJob,
     updateJob,

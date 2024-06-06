@@ -1,6 +1,28 @@
 import db from '../models/index.js';
 
 // Manage Candidate Profile
+const createCandidateProfile = async (req, res) => {
+    try {
+        const {fullName, dob, gender, jobPosition, phoneNumber, address, workStatus, description, interests, avatarImgUrl } = req.body;
+        let newCandidate = await db.Candidate.create({
+            account_id: accountId,
+            full_name: fullName,
+            dob: dob,
+            gender: gender,
+            job_position: jobPosition,
+            phone_number: phoneNumber,
+            address: address,
+            work_status: workStatus,
+            description: description,
+            interests: interests,
+            avatar_img_url: avatarImgUrl,
+        });
+        res.status(201).json({ status: 'success', data: newCandidate });
+    } catch (error) {
+        res.status(500).json({ status: 'error', message: error.message });
+    }
+};
+
 const manageProfile = async (candidateId, data, action) => {
     const candidate = await db.Candidate.findByPk(candidateId);
     if (!candidate) return { status: 'error', message: 'Candidate not found' };
@@ -80,6 +102,7 @@ const applyForJob = async (jobId, candidateId) => {
 };
 
 export default {
+    createCandidateProfile,
     manageProfile,
     addWorkExperience,
     getWorkExperiences,

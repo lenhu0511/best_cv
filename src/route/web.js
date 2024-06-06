@@ -3,10 +3,12 @@ import accountController from "../controller/accountController.js";
 import candidateController from "../controller/candidateController.js"; 
 import recruiterController from "../controller/recruiterController.js";
 import authenticateToken from '../middleware/authenticateToken.js'; 
+import cors from 'cors';
 
 let router = express.Router();
 
 const initWebRoutes = (app) => {
+    router.use(cors());
     // Account Functions
     router.post('/api/signup', accountController.handleSignup);
     router.post('/api/login', accountController.handleLogin);
@@ -16,6 +18,7 @@ const initWebRoutes = (app) => {
     router.put('/api/account/profile', authenticateToken, accountController.updateAccountProfile); // To update the profile
 
     // Recruiter Functions
+    router.post('/api/recruiters/profile', authenticateToken, recruiterController.createRecruiterProfile);
     router.post('/api/recruiters/jobs', recruiterController.postJob);
     router.put('/api/recruiters/jobs/:jobId', recruiterController.updateJob);
     router.delete('/api/recruiters/jobs/:jobId', recruiterController.deleteJob);
@@ -25,6 +28,7 @@ const initWebRoutes = (app) => {
     router.get('/api/recruiters/candidates/:candidateId', recruiterController.getCandidateProfile);
 
     // Candidate Functions
+    router.post('/api/candidates/profile', candidateController.createCandidateProfile);
     router.get('/api/candidates/profile/:candidateId', candidateController.manageCandidateProfile);
     router.put('/api/candidates/profile/:candidateId', candidateController.manageCandidateProfile);
     router.post('/api/candidates/work-experience/:candidateId', candidateController.handleWorkExperience);

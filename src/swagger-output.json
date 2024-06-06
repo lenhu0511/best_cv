@@ -21,7 +21,6 @@
       "name": "Candidate Operations",
       "description": "Operations available to Candidates"
     }
-
   ],
   "paths": {
     "/api/login": {
@@ -62,12 +61,7 @@
             }
           },
           "500": { "description": "Internal Server Error - Missing inputs or server error" }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/api/signup": {
@@ -174,6 +168,79 @@
         ]
       }
     },
+    "/api/recruiters/profile": {
+      "post": {
+        "tags": ["Recruiter Operations"],
+        "description": "Creates the profile details of a recruiter and the company.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "companyName": { "type": "string", "example": "Tech Corp" },
+                "companyDescription": { "type": "string", "example": "Leading tech company." },
+                "contactPerson": { "type": "string", "example": "Lilisa" },
+                "email": { "type": "string", "example": "contact@techcorp.com" },
+                "phonenumber": { "type": "string", "example": "123123123" },
+                "address": { "type": "string", "example": "123 Tech Street" },
+                "account_id": { "type": "string", "example": "account_id" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Recruiter profile created successfully" },
+          "400": { "description": "Invalid input, object invalid" },
+          "500": { "description": "Server error" }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    }, 
+    "/api/recruiters/profile/{recruiterId}": {
+      "put": {
+        "tags": ["Recruiter Operations"],
+        "description": "Update recruiter company profile.",
+        "parameters": [
+          {
+            "name": "recruiterId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the recruiter"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "contact_person": { "type": "string", "example": "Nanako" },
+                "phone_number": { "type": "string", "example": "57575757" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Profile updated successfully" },
+          "400": { "description": "Bad Request - Missing or invalid parameters" },
+          "404": { "description": "Not Found - Recruiter not found" },
+          "500": { "description": "Internal Server Error - Error in updating profile" }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/recruiters/jobs": {
       "post": {
         "tags": ["Recruiter Operations"],
@@ -199,7 +266,12 @@
           "200": { "description": "Job posted successfully" },
           "400": { "description": "Bad Request - Missing or invalid parameters" },
           "500": { "description": "Internal Server Error - Error in posting job" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/recruiters/jobs/{jobId}": {
@@ -235,7 +307,12 @@
           "400": { "description": "Bad Request - Missing or invalid parameters" },
           "404": { "description": "Not Found - Job not found" },
           "500": { "description": "Internal Server Error - Error in updating job" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "delete": {
         "tags": ["Recruiter Operations"],
@@ -253,47 +330,15 @@
           "200": { "description": "Job deleted successfully" },
           "404": { "description": "Not Found - Job not found" },
           "500": { "description": "Internal Server Error - Error in deleting job" }
-        }
-      }
-    },
-    "/api/recruiters/profile/{recruiterId}": {
-      "put": {
-        "tags": ["Recruiter Operations"],
-        "description": "Update recruiter company profile.",
-        "parameters": [
+        },
+        "security": [
           {
-            "name": "recruiterId",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The ID of the recruiter"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "company_name": { "type": "string", "example": "Tech Corp" },
-                "company_description": { "type": "string", "example": "Leading tech company." },
-                "contact_person": { "type": "string", "example": "John Doe" },
-                "email": { "type": "string", "example": "contact@techcorp.com" },
-                "phone_number": { "type": "string", "example": "0123456789" },
-                "address": { "type": "string", "example": "123 Tech Street" }
-              }
-            }
+            "Bearer": []
           }
-        ],
-        "responses": {
-          "200": { "description": "Profile updated successfully" },
-          "400": { "description": "Bad Request - Missing or invalid parameters" },
-          "404": { "description": "Not Found - Recruiter not found" },
-          "500": { "description": "Internal Server Error - Error in updating profile" }
-        }
+        ]
       }
     },
-  "/api/recruiters/jobs/{jobId}/candidates": {
+    "/api/recruiters/jobs/{jobId}/candidates": {
       "get": {
         "tags": ["Recruiter Operations"],
         "description": "Retrieves candidates that have applied for a specific job.",
@@ -322,7 +367,12 @@
           },
           "404": { "description": "Job not found" },
           "500": { "description": "Internal server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/recruiters/candidates": {
@@ -345,7 +395,12 @@
             }
           },
           "500": { "description": "Internal server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/recruiters/candidates/{candidateId}": {
@@ -374,7 +429,50 @@
           },
           "404": { "description": "Candidate not found" },
           "500": { "description": "Internal server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/candidates/profile": {
+      "post": {
+        "tags": ["Candidate Operations"],
+        "summary": "Create a candidate's profile",
+        "description": "Creates the profile details of a candidate.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "account_id": { "type": "string" },
+                "full_name": { "type": "string" },
+                "dob": { "type": "string", "format": "date" },
+                "gender": { "type": "string" },
+                "job_position": { "type": "string" },
+                "phone_number": { "type": "string" },
+                "address": { "type": "string" },
+                "description": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Candidate profile created successfully" },
+          "400": { "description": "Invalid input, object invalid" },
+          "404": { "description": "Profile not found" },
+          "500": { "description": "Server error" }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/candidates/profile/{candidateId}": {
@@ -410,7 +508,12 @@
           },
           "404": { "description": "Profile not found" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "put": {
         "tags": ["Candidate Operations"],
@@ -447,7 +550,12 @@
           "400": { "description": "Invalid input, object invalid" },
           "404": { "description": "Profile not found" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/candidates/work-experience/{candidateId}": {
@@ -483,7 +591,12 @@
           "201": { "description": "Work experience added successfully" },
           "400": { "description": "Invalid input, object invalid" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "get": {
         "tags": ["Candidate Operations"],
@@ -518,7 +631,12 @@
           },
           "404": { "description": "No work experience found" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "put": {
         "tags": ["Candidate Operations"],
@@ -553,7 +671,12 @@
           "400": { "description": "Invalid input, object invalid" },
           "404": { "description": "Work experience not found" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "delete": {
         "tags": ["Candidate Operations"],
@@ -572,7 +695,12 @@
           "200": { "description": "Work experience deleted successfully" },
           "404": { "description": "Work experience not found" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/candidates/education/{candidateId}": {
@@ -611,7 +739,12 @@
           "201": { "description": "Education details added successfully" },
           "400": { "description": "Invalid input, object invalid" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "get": {
         "tags": ["Candidate Operations"],
@@ -648,7 +781,12 @@
           },
           "404": { "description": "No education details found" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/candidates/education/{educationId}": {
@@ -688,7 +826,12 @@
           "400": { "description": "Invalid input, object invalid" },
           "404": { "description": "Education details not found" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       },
       "delete": {
         "tags": ["Candidate Operations"],
@@ -707,7 +850,12 @@
           "200": { "description": "Education details deleted successfully" },
           "404": { "description": "Education details not found" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/candidates/jobs/apply/{jobId}/{candidateId}": {
@@ -736,7 +884,12 @@
           "400": { "description": "Invalid input, object invalid" },
           "404": { "description": "Job or candidate not found" },
           "500": { "description": "Server error" }
-        }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     }
   },
@@ -748,5 +901,9 @@
       "description": "JWT Authorization header using the Bearer scheme. Example: 'Bearer abcdef12345'"
     }
   },
-  "security": [] 
+  "security": [
+    {
+      "Bearer": []
+    }
+  ]
 }

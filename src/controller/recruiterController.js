@@ -1,5 +1,17 @@
 import recruiterService from '../services/recruiterService.js';
 
+const createRecruiterProfile = async (req, res) => {
+    try {
+        const email = req.user.email; // Get email from the request body or from session/authentication
+        // console.log(res)
+        let newRecruiter = await recruiterService.createRecruiterProfile(email, req.body);
+        return res.status(201).json(newRecruiter);
+    } catch (e) {
+        return res.status(500).json({ message: e.message });
+    }
+};
+
+
 const updateCompanyProfile = async (req, res) => {
     const result = await recruiterService.updateCompanyProfile(req.params.recruiterId, req.body);
     if (result.status === 'success') {
@@ -64,6 +76,7 @@ const getCandidateProfile = async (req, res) => {
 };
 
 export default {
+    createRecruiterProfile,
     updateCompanyProfile,
     postJob,
     updateJob,

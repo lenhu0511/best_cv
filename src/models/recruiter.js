@@ -22,9 +22,18 @@ export default (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     phone_number: DataTypes.STRING,
     address: DataTypes.STRING,
+    account_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Account', // Name of the model being referenced
+        key: 'id'
+      }
+    }
   }, {
     sequelize,
     modelName: 'Recruiter',
+    tableName: 'recruiter',
+    timestamps: false
   });
   return Recruiter;
 };

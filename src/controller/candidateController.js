@@ -1,5 +1,14 @@
 import candidateService from '../services/candidateService.js';
 
+const createCandidateProfile = async (profileData) => {
+    try {
+        const newProfile = await db.Candidate.create(profileData);
+        return { status: 'success', data: newProfile };
+    } catch (error) {
+        return { status: 'error', message: error.message };
+    }
+};
+
 const manageCandidateProfile = async (req, res) => {
     const { candidateId } = req.params;  // Ensure candidateId is passed correctly
     const data = req.body;
@@ -51,6 +60,7 @@ const applyJob = async (req, res) => {
 };
 
 export default {
+    createCandidateProfile,
     manageCandidateProfile,
     handleWorkExperience,
     manageEducation,
