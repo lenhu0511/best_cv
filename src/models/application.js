@@ -27,11 +27,19 @@ export default (sequelize, DataTypes) => {
     },
     status: DataTypes.STRING,
     job_id: DataTypes.STRING,
-    account_id: DataTypes.STRING
+    account_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Account', // Name of the model being referenced
+        key: 'id'
+      },
+      allowNull : false
+    }
   }, {
     freezeTableName: true,
     sequelize,
     modelName: 'Application',
+    tableName: 'application',
     timestamps: false
   });
   return Application;

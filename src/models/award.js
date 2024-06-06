@@ -24,12 +24,20 @@ export default (sequelize, DataTypes) => {
     date_received: DataTypes.DATE,
     certificate_img_url: DataTypes.STRING,
     description: DataTypes.STRING,
-    candidate_id: DataTypes.STRING
+    candidate_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Candidate', // Name of the model being referenced
+        key: 'id'
+      },
+      allowNull : false
+    }
 
   }, {
     freezeTableName: true,
     sequelize,
     modelName: 'Award',
+    tableName: 'award',
     timestamps: false
   });
   return Award;

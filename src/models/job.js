@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 export default (sequelize, DataTypes) => {
   class Job extends Model {
     static associate(models) {
-      Job.belongsTo(models.Recruiter, { foreignKey: 'recruiters_id' });
+      Job.belongsTo(models.Account, { foreignKey: 'account_id' });
       Job.hasMany(models.Application, { foreignKey: 'job_id' });
     }
   }
@@ -20,15 +20,21 @@ export default (sequelize, DataTypes) => {
     job_requirements: DataTypes.STRING,
     location: DataTypes.STRING,
     salary: DataTypes.DECIMAL,
-    post_date: {
-      type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
-    },
+    post_date: DataTypes.DATE,
     status: DataTypes.STRING,
+    account_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Account', // Name of the model being referenced
+        key: 'id'
+      },
+      allowNull : false
+    }
   }, {
     sequelize,
     modelName: 'Job',
     tableName: 'job',
+    timestamps: false
   });
   return Job;
 };

@@ -24,9 +24,18 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
     },
+    candidate_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Candidate', // Name of the model being referenced
+        key: 'id'
+      },
+      allowNull : false
+    }
   }, {
     sequelize,
     modelName: 'CandidateCV',
+    tableName: 'candidate_cv',
     hooks: {
       beforeCreate: (candidateCV, options) => {
         candidateCV.create_date = new Date();

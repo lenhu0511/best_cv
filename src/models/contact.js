@@ -17,9 +17,27 @@ export default (sequelize, DataTypes) => {
   },
     contact_date: DataTypes.DATE,
     message: DataTypes.STRING,
+    recruiter_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Recruiter', // Name of the model being referenced
+        key: 'id'
+      },
+      allowNull : false
+    },
+    candidate_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Candidate', // Name of the model being referenced
+        key: 'id'
+      },
+      allowNull : false
+    }
   }, {
     sequelize,
     modelName: 'Contact',
+    tableName: 'contact',
+    timestamps: false
   });
   return Contact;
 };

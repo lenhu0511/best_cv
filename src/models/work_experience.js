@@ -20,9 +20,19 @@ export default (sequelize, DataTypes) => {
     end_date: DataTypes.DATE,
     description: DataTypes.STRING,
     status: DataTypes.STRING,
+    candidate_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Candidate', // Name of the model being referenced
+        key: 'id'
+      },
+      allowNull : false
+    }
   }, {
     sequelize,
     modelName: 'WorkExperience',
+    tableName: 'work_experience',
+    timestamps: false
   });
   return WorkExperience;
 };

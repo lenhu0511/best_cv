@@ -244,28 +244,62 @@
     "/api/recruiters/jobs": {
       "post": {
         "tags": ["Recruiter Operations"],
-        "description": "Post a new job by a recruiter.",
+        "summary": "Post a new job by a recruiter.",
+        "description": "Allows recruiters to post new job listings.",
+        "operationId": "postJob",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
         "parameters": [
           {
-            "name": "body",
             "in": "body",
+            "name": "body",
+            "description": "Job data payload",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "jobTitle": { "type": "string", "example": "Developer" },
-                "jobDescription": { "type": "string", "example": "Develop high-quality software." },
                 "jobType": { "type": "string", "example": "Full-time" },
+                "jobDescription": { "type": "string", "example": "Develop high-quality software." },
+                "jobRequirements": { "type": "string", "example": "5 years of experience in software development" },
                 "location": { "type": "string", "example": "Remote" },
-                "salary": { "type": "number", "example": 80000 }
+                "salary": { "type": "number", "format": "float", "example": 80000 },
+                "account_id": { "type": "string", "example": "account_id" }
               }
             }
           }
         ],
         "responses": {
-          "200": { "description": "Job posted successfully" },
-          "400": { "description": "Bad Request - Missing or invalid parameters" },
-          "500": { "description": "Internal Server Error - Error in posting job" }
+          "201": {
+            "description": "Job posted successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": { "type": "string", "example": "success" },
+                "job": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string", "example": "uuid" },
+                    "jobTitle": { "type": "string", "example": "Developer" },
+                    "jobDescription": { "type": "string", "example": "Develop high-quality software." },
+                    "jobType": { "type": "string", "example": "Full-time" },
+                    "jobRequirements": { "type": "string", "example": "5 years of experience in software development" },
+                    "location": { "type": "string", "example": "Remote" },
+                    "salary": { "type": "number", "format": "float", "example": 80000 }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing or invalid parameters"
+          },
+          "401": {
+            "description": "Unauthorized - Authentication credentials were not provided or are invalid."
+          },
+          "500": {
+            "description": "Internal Server Error - Error in posting job"
+          }
         },
         "security": [
           {

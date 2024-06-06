@@ -15,6 +15,7 @@ export default (sequelize, DataTypes) => {
       Account.hasOne(models.Candidate, { foreignKey: 'account_id' });
       Account.hasOne(models.Recruiter, { foreignKey: 'account_id' });
       Account.belongsTo(models.Role, { foreignKey: 'role_id' });
+      Account.hasMany(models.Job, { foreignKey: 'account_id' });
     }
   };
   Account.init({
@@ -38,7 +39,18 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
     },
-    role_id: DataTypes.STRING
+    role_id: {
+        type: DataTypes.STRING,
+        references: {
+            model: 'Role',
+            key: 'id'
+        },
+        validate: {
+            notEmpty: true,
+            // Optionally, if you have specific roles:
+            isIn: [['1', '2']]  // Adjust the role IDs as necessary.
+        }
+    }
 
   }, {
     freezeTableName: true,

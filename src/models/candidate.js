@@ -28,9 +28,19 @@ export default (sequelize, DataTypes) => {
     description: DataTypes.STRING,
     interests: DataTypes.STRING,
     avatar_img_url: DataTypes.STRING,
+    account_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Account', // Name of the model being referenced
+        key: 'id'
+      },
+      allowNull : false
+    }
   }, {
     sequelize,
     modelName: 'Candidate',
+    tableName: 'candidate',
+    timestamps: false
   });
   return Candidate;
 };

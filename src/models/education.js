@@ -23,9 +23,19 @@ export default (sequelize, DataTypes) => {
     major: DataTypes.STRING,
     school_name: DataTypes.STRING,
     status: DataTypes.STRING,
+    candidate_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: 'Candidate', // Name of the model being referenced
+        key: 'id'
+      },
+      allowNull : false
+    }
   }, {
     sequelize,
     modelName: 'Education',
+    tableName: 'education',
+    timestamps: false
   });
   return Education;
 };

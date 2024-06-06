@@ -1,25 +1,27 @@
 import express from "express";
 import accountController from "../controller/accountController.js";
-import candidateController from "../controller/candidateController.js"; 
+import candidateController from "../controller/candidateController.js";
 import recruiterController from "../controller/recruiterController.js";
-import authenticateToken from '../middleware/authenticateToken.js'; 
+import authenticateToken from '../middleware/authenticateToken.js';
 import cors from 'cors';
 
 let router = express.Router();
 
 const initWebRoutes = (app) => {
     router.use(cors());
+
     // Account Functions
     router.post('/api/signup', accountController.handleSignup);
     router.post('/api/login', accountController.handleLogin);
     router.post('/api/logout', accountController.handleLogout);
-    // Apply middleware to profile routes
-    router.get('/api/account/profile', authenticateToken, accountController.getAccountProfile); // To get the profile
-    router.put('/api/account/profile', authenticateToken, accountController.updateAccountProfile); // To update the profile
+    router.get('/api/account/profile', authenticateToken, accountController.getAccountProfile);
+    router.put('/api/account/profile', authenticateToken, accountController.updateAccountProfile);
 
     // Recruiter Functions
     router.post('/api/recruiters/profile', authenticateToken, recruiterController.createRecruiterProfile);
-    router.post('/api/recruiters/jobs', recruiterController.postJob);
+    router.get('/api/recruiters/profile', authenticateToken, recruiterController.getRecruiterProfile); // New route to get recruiter profile
+    router.put('/api/recruiters/profile', authenticateToken, recruiterController.updateRecruiterProfile); // New route to update recruiter profile
+    router.post('/api/recruiters/jobs', authenticateToken, recruiterController.postJob);
     router.put('/api/recruiters/jobs/:jobId', recruiterController.updateJob);
     router.delete('/api/recruiters/jobs/:jobId', recruiterController.deleteJob);
     router.put('/api/recruiters/profile/:recruiterId', recruiterController.updateCompanyProfile);

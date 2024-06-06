@@ -1,11 +1,16 @@
 import db from '../models/index.js';
 
 // Manage Candidate Profile
-const createCandidateProfile = async (req, res) => {
-    try {
-        const {fullName, dob, gender, jobPosition, phoneNumber, address, workStatus, description, interests, avatarImgUrl } = req.body;
+let createCandidateProfile = (email, data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const accountInfo = await accountService.getAccountInfo(email);
+            if (accountInfo.status !== 'success') {
+                throw new Error(accountInfo.message); // Handle the case where the account is not found
+            }
+            data.account_id = accountInfo.account.id;
+
         let newCandidate = await db.Candidate.create({
-            account_id: accountId,
             full_name: fullName,
             dob: dob,
             gender: gender,
@@ -16,12 +21,14 @@ const createCandidateProfile = async (req, res) => {
             description: description,
             interests: interests,
             avatar_img_url: avatarImgUrl,
+            account_id: data.account_id
         });
-        res.status(201).json({ status: 'success', data: newCandidate });
-    } catch (error) {
-        res.status(500).json({ status: 'error', message: error.message });
+        resolveInclude(newCandidate);
+    } catch (e) {
+        reject(e);
     }
-};
+    });
+}
 
 const manageProfile = async (candidateId, data, action) => {
     const candidate = await db.Candidate.findByPk(candidateId);
@@ -31,7 +38,7 @@ const manageProfile = async (candidateId, data, action) => {
         case 'update':
             await candidate.update(data);
             return { status: 'success', data: candidate };
-        case 'get':
+        case 'get':  
             return { status: 'success', data: candidate };
         default:
             return { status: 'error', message: 'Invalid action' };

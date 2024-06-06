@@ -28,6 +28,37 @@ let createRecruiterProfile = (email, data) => {
     });
 }
 
+const getAccountInfo = async (email) => {
+  try {
+    const account = await db.Account.findOne({
+      where: { email: email },
+      include: [ ]
+    });
+
+    if (!account) {
+      return { status: 'error', message: 'Account not found' };
+    }
+
+    const profileData = account.role_id === 'candidate' ? account.Candidate : account.Recruiter;
+
+    const response = {
+      status: 'success',
+      account: {
+        id: account.id,
+        username: account.username,
+        email: account.email,
+        fullName: account.full_name,
+        phoneNumber: account.phone_number,
+        role_id: account.role_id
+      },
+      profile: profileData
+    };
+
+    return response;
+  } catch (error) {
+    return { status: 'error', message: error.message };
+  }
+};
 
 // Service to update company (recruiter) profile
 const updateCompanyProfile = async (recruiterId, profileData) => {
@@ -44,13 +75,32 @@ const updateCompanyProfile = async (recruiterId, profileData) => {
 };
 
 // Service to post a new job
-const postJob = async (jobData) => {
-    try {
-        const job = await db.Job.create(jobData);
-        return { status: 'success', job };
-    } catch (error) {
-        return { status: 'error', message: error.message };
-    }
+const postJob = async (email, jobData) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            console.log("Job Data:", jobData);
+            console.log("Email:", email);
+            const accountInfo = await accountService.getAccountInfo(email);
+            if (accountInfo.status !== 'success') {
+                throw new Error(accountInfo.message); // Handle the case where the account is not found
+            }
+            jobData.account_id = accountInfo.account.id; // Set the account_id from the fetched account
+            let newJob = await db.Job.create({
+            job_title: jobData.jobTitle,
+            job_type: jobData.jobType,
+            job_description: jobData.jobDescription,
+            job_requirements: jobData.jobRequirements,
+            location: jobData.location,
+            salary: jobData.salary,
+            post_date: new Date(),
+            account_id: jobData.account_id,  // Assuming this is passed in jobData
+            status: 'open'  // Default status
+        });
+            resolve(newJob);
+        } catch (e) {
+            reject(e);
+        }
+    });
 };
 
 // Service to update a job
@@ -126,4 +176,5 @@ export default {
     getAppliedCandidates,
     getCandidateProfile,
     getAllCandidates
+    // getRecruiterByUserEmail
 };

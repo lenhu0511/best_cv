@@ -6,7 +6,7 @@ export default (sequelize, DataTypes) => {
   class Recruiter extends Model {
     static associate(models) {
       Recruiter.belongsTo(models.Account, { foreignKey: 'account_id' });
-      Recruiter.hasMany(models.Job, { foreignKey: 'recruiters_id' });
+      // Recruiter.hasMany(models.Job, { foreignKey: 'account_id' });
       Recruiter.hasMany(models.Contact, { foreignKey: 'recruiter_id' });
     }
   }
@@ -27,7 +27,8 @@ export default (sequelize, DataTypes) => {
       references: {
         model: 'Account', // Name of the model being referenced
         key: 'id'
-      }
+      },
+      allowNull : false
     }
   }, {
     sequelize,

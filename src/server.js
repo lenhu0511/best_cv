@@ -35,8 +35,6 @@ const corsOptions = {
 app.use(express.json());
 app.use(cors());
 
-
-
 // Load and setup Swagger documentation
 async function loadSwaggerDocument() {
   const swaggerPath = path.join(__dirname, './swagger-output.json');
