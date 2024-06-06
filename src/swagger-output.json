@@ -484,14 +484,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "account_id": { "type": "string" },
-                "full_name": { "type": "string" },
-                "dob": { "type": "string", "format": "date" },
-                "gender": { "type": "string" },
-                "job_position": { "type": "string" },
-                "phone_number": { "type": "string" },
-                "address": { "type": "string" },
-                "description": { "type": "string" }
+                "full_name": { "type": "string", "example": "John Doe" },
+                "dob": { "type": "string", "format": "date", "example": "1985-05-16" },
+                "gender": { "type": "string", "example": "Male" },
+                "job_position": { "type": "string", "example": "Software Developer" },
+                "phone_number": { "type": "string", "example": "555-1234" },
+                "address": { "type": "string", "example": "123 Main St, Cityville" },
+                "description": { "type": "string", "example": "Experienced software developer" },
+                "interests": { "type": "string", "example": "Python"},
+                "avatar_img_url": { "type": "string", "example": "https://example.com/avatar.jpg" },
+                 "account_id": { "type": "string", "example": "account_id" }
               }
             }
           }

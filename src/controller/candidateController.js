@@ -1,11 +1,13 @@
 import candidateService from '../services/candidateService.js';
 
-const createCandidateProfile = async (profileData) => {
+const createCandidateProfile = async (req, res) => {
     try {
-        const newProfile = await db.Candidate.create(profileData);
-        return { status: 'success', data: newProfile };
-    } catch (error) {
-        return { status: 'error', message: error.message };
+        const email = req.user.email; // Get email from the request body or from session/authentication
+        // console.log(res)
+        let newCandidate = await candidateService.createCandidateProfile(email, req.body);
+        return res.status(201).json(newCandidate);
+    } catch (e) {
+        return res.status(500).json({ message: e.message });
     }
 };
 

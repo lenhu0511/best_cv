@@ -1,4 +1,5 @@
 import db from '../models/index.js';
+import accountService from './accountService.js';
 
 // Manage Candidate Profile
 let createCandidateProfile = (email, data) => {
@@ -11,26 +12,26 @@ let createCandidateProfile = (email, data) => {
             data.account_id = accountInfo.account.id;
 
         let newCandidate = await db.Candidate.create({
-            full_name: fullName,
-            dob: dob,
-            gender: gender,
-            job_position: jobPosition,
-            phone_number: phoneNumber,
-            address: address,
-            work_status: workStatus,
-            description: description,
-            interests: interests,
-            avatar_img_url: avatarImgUrl,
+            full_name: data.full_name,
+            dob: data.dob,
+            gender: data.gender,
+            job_position: data.job_position,
+            phone_number: data.phone_number,
+            address: data.address,
+            work_status: 'Available',
+            description: data.description,
+            interests: data.interests,
+            avatar_img_url: data.avatarImgUrl,
             account_id: data.account_id
         });
-        resolveInclude(newCandidate);
+        resolve(newCandidate);
     } catch (e) {
         reject(e);
     }
     });
 }
 
-const manageProfile = async (candidateId, data, action) => {
+const manageCandidateProfile = async (candidateId, data, action) => {
     const candidate = await db.Candidate.findByPk(candidateId);
     if (!candidate) return { status: 'error', message: 'Candidate not found' };
 
@@ -110,7 +111,7 @@ const applyForJob = async (jobId, candidateId) => {
 
 export default {
     createCandidateProfile,
-    manageProfile,
+    manageCandidateProfile,
     addWorkExperience,
     getWorkExperiences,
     updateWorkExperience,

@@ -19,8 +19,6 @@ const initWebRoutes = (app) => {
 
     // Recruiter Functions
     router.post('/api/recruiters/profile', authenticateToken, recruiterController.createRecruiterProfile);
-    router.get('/api/recruiters/profile', authenticateToken, recruiterController.getRecruiterProfile); // New route to get recruiter profile
-    router.put('/api/recruiters/profile', authenticateToken, recruiterController.updateRecruiterProfile); // New route to update recruiter profile
     router.post('/api/recruiters/jobs', authenticateToken, recruiterController.postJob);
     router.put('/api/recruiters/jobs/:jobId', recruiterController.updateJob);
     router.delete('/api/recruiters/jobs/:jobId', recruiterController.deleteJob);
@@ -30,7 +28,7 @@ const initWebRoutes = (app) => {
     router.get('/api/recruiters/candidates/:candidateId', recruiterController.getCandidateProfile);
 
     // Candidate Functions
-    router.post('/api/candidates/profile', candidateController.createCandidateProfile);
+    router.post('/api/candidates/profile', authenticateToken, candidateController.createCandidateProfile);
     router.get('/api/candidates/profile/:candidateId', candidateController.manageCandidateProfile);
     router.put('/api/candidates/profile/:candidateId', candidateController.manageCandidateProfile);
     router.post('/api/candidates/work-experience/:candidateId', candidateController.handleWorkExperience);
@@ -41,7 +39,7 @@ const initWebRoutes = (app) => {
     router.get('/api/candidates/education/:candidateId', candidateController.manageEducation);
     router.put('/api/candidates/education/:educationId', candidateController.manageEducation);
     router.delete('/api/candidates/education/:educationId', candidateController.manageEducation);
-    router.post('/api/candidates/jobs/apply/:jobId/:candidateId', candidateController.applyJob);
+    router.post('/api/candidates/jobs/apply/:jobId/:candidateId', authenticateToken, candidateController.applyJob);
 
     return app.use("/", router);
 }

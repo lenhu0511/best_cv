@@ -28,37 +28,37 @@ let createRecruiterProfile = (email, data) => {
     });
 }
 
-const getAccountInfo = async (email) => {
-  try {
-    const account = await db.Account.findOne({
-      where: { email: email },
-      include: [ ]
-    });
+// const getRecuiterInfo = async (email) => {
+//   try {
+//     const account = await db.Account.findOne({
+//       where: { email: email },
+//       include: [ ]
+//     });
 
-    if (!account) {
-      return { status: 'error', message: 'Account not found' };
-    }
+//     if (!account) {
+//       return { status: 'error', message: 'Account not found' };
+//     }
 
-    const profileData = account.role_id === 'candidate' ? account.Candidate : account.Recruiter;
+//     const profileData = account.role_id === 'candidate' ? account.Candidate : account.Recruiter;
 
-    const response = {
-      status: 'success',
-      account: {
-        id: account.id,
-        username: account.username,
-        email: account.email,
-        fullName: account.full_name,
-        phoneNumber: account.phone_number,
-        role_id: account.role_id
-      },
-      profile: profileData
-    };
+//     const response = {
+//       status: 'success',
+//       account: {
+//         id: account.id,
+//         username: account.username,
+//         email: account.email,
+//         fullName: account.full_name,
+//         phoneNumber: account.phone_number,
+//         role_id: account.role_id
+//       },
+//       profile: profileData
+//     };
 
-    return response;
-  } catch (error) {
-    return { status: 'error', message: error.message };
-  }
-};
+//     return response;
+//   } catch (error) {
+//     return { status: 'error', message: error.message };
+//   }
+// };
 
 // Service to update company (recruiter) profile
 const updateCompanyProfile = async (recruiterId, profileData) => {
