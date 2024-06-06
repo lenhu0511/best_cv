@@ -22,18 +22,38 @@ dotenv.config(); // This will load the .env file and make the variables availabl
 //   }
 // });
 
+const allowedOrigins = [
+  'http://localhost:6969',
+  'https://https://best-cv.netlify.app/',
+  'https://best-cv.azurewebsites.net/'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['*'],
+  exposedHeaders: ['custom-header1', 'custom-header2']
+};
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const port = process.env.PORT || 6969;
-const corsOptions = {
-    origin: true, 
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    methods: 'GET,POST,PUT,DELETE,OPTIONS'
-};
+// const corsOptions = {
+//     origin: true, 
+//     credentials: true,
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     methods: 'GET,POST,PUT,DELETE,OPTIONS'
+// };
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 // Load and setup Swagger documentation
 async function loadSwaggerDocument() {
